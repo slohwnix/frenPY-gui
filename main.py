@@ -68,14 +68,9 @@ class MainWindow(QMainWindow):
 
     def run_file(self):
         if self.current_file:
-            self.console.append(f"Exécution du fichier: {self.current_file}")
+            self.console.append(f"Exécution du fichier dans la console: {self.current_file}")
             try:
-                with open(self.current_file, 'r', encoding='utf-8') as file:
-                    code = file.read()
-                    output = io.StringIO()
-                    with contextlib.redirect_stdout(output):
-                        exec(code, {'__name__': '__main__'})
-                    self.console.append(output.getvalue())
+                frenpy.load(self.current_file)
             except Exception as e:
                 self.console.append(f"Erreur lors de l'exécution: {e}")
         else:
