@@ -67,7 +67,11 @@ class MainWindow(QMainWindow):
     def run_file(self):
         if self.current_file:
             self.console.append(f"Exécution du fichier: {self.current_file}")
-            frenpy.load(self.current_file)
+            try:
+                with open(self.current_file, 'r', encoding='utf-8') as file:
+                    exec(file.read(), {'__name__': '__main__'})
+            except Exception as e:
+                self.console.append(f"Erreur lors de l'exécution: {e}")
         else:
             self.console.append("Aucun fichier .frenpy ouvert.")
 
