@@ -1,13 +1,15 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QTextEdit, QPushButton, QVBoxLayout, QWidget
 import frenpy
+import io
+import contextlib
 
 frenpy_template = """
 # frenpy template
 afficher("Hello, World!")
 # frenpy config :
 frpy_info
-frpy_scc=false # Sauvegarder le fichier compilé
+frpy_scc="false" # Sauvegarder le fichier compilé
 """
 
 class MainWindow(QMainWindow):
@@ -69,7 +71,11 @@ class MainWindow(QMainWindow):
             self.console.append(f"Exécution du fichier: {self.current_file}")
             try:
                 with open(self.current_file, 'r', encoding='utf-8') as file:
-                    exec(file.read(), {'__name__': '__main__'})
+                    code = file.read()
+                    output = io.StringIO()
+                    with contextlib.redirect_stdout(output):
+                        exec(code, {'__name__': '__main__'})
+                    self.console.append(output.getvalue())
             except Exception as e:
                 self.console.append(f"Erreur lors de l'exécution: {e}")
         else:
