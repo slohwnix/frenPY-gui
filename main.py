@@ -472,6 +472,10 @@ class FrenpyIDE(QMainWindow):
             QMessageBox.critical(self, "Erreur", f"Erreur lors de la fermeture: {str(e)}")
             event.ignore()
 
+    def display_words(self):
+        words = get_words_frenpy()
+        self.console_output.appendPlainText("Mots disponibles : " + ", ".join(words))
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     ide = FrenpyIDE()
