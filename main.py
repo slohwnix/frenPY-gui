@@ -304,7 +304,7 @@ class FrenpyIDE(QMainWindow):
     def open_file(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Frenpy files (*.frenpy);;All Files (*)")
         if file_path:
-            with open(file_path, "r") as file:
+            with open(file_path, "r", encoding="utf-8") as file:
                 content = file.read()
                 editor = CodeEditor()
                 editor.setPlainText(content)
@@ -386,7 +386,7 @@ class FrenpyIDE(QMainWindow):
         file_path = self.model.filePath(index)
         if QDir(file_path).exists():
             return 
-        with open(file_path, "r") as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
             editor = CodeEditor()
             editor.setPlainText(content)
