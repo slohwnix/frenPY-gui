@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QIcon, QAction, QFileSystemModel, QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QPainter, QTextFormat
 from PyQt6.QtCore import Qt, QDir, QRegularExpression, QStringListModel, QRect, QSize, QProcess, QThread, pyqtSignal, QEvent
-from frenpy import load, compile_frenpy  
+from frenpy import load, compile_frenpy, get_words_frenpy
 
 class PythonHighlighter(QSyntaxHighlighter):
     def __init__(self, parent=None):
@@ -21,10 +21,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         keyword_format = QTextCharFormat()
         keyword_format.setForeground(QColor("white"))
         keyword_format.setFontWeight(QFont.Weight.Bold)
-        keywords = [
-            "importer", "afficher", "si", "sinon", "répéter à l'infini", "arrondir", "nouvelle_écran", "frpy_info", "stopper", "attendre", "saisir",
-            "dans la", "frpy_scc=", "True", "False", "frpy_debug=", "définir", "pour"
-        ]
+        keywords = get_words_frenpy()
         for keyword in keywords:
             pattern = QRegularExpression(f"\\b{keyword}\\b")
             self.highlighting_rules.append((pattern, keyword_format))
