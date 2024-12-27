@@ -22,12 +22,12 @@ class PythonHighlighter(QSyntaxHighlighter):
         keyword_format.setForeground(QColor("white"))
         keyword_format.setFontWeight(QFont.Weight.Bold)
         keywords = [
-    "importer", "afficher", "si", "sinon", "répéter à l'infini", "arrondir", "nouvelle_écran", "stopper", "attendre", 
-    "saisir", "dans la", "frpy_scc=True", "frpy_debug=True", "frpy_debug=False", "retourner", "et", "ou", "non", 
-    "vrai", "faux", "pour", "tant que", "essayer", "except", "avec", "classe", "importer comme", "depuis", "lever", 
-    "continuer", "passer", "supprimer", "global", "lambda", "assurer", "ranger", "longueur", "ouvrir", "liste", 
-    "dictionnaire", "ensemble", "tuple", "enumerer", "toutes", "n'importe lequel", "plage", "type"
-]
+            "importer", "afficher", "si", "sinon", "répéter à l'infini", "arrondir", "nouvelle_écran", "stopper", "attendre", 
+            "saisir", "dans la", "frpy_scc=True", "frpy_debug=True", "frpy_debug=False", "retourner", "et", "ou", "non", 
+            "vrai", "faux", "pour", "tant que", "essayer", "except", "avec", "classe", "importer comme", "depuis", "lever", 
+            "continuer", "passer", "supprimer", "global", "lambda", "assurer", "ranger", "longueur", "ouvrir", "liste", 
+            "dictionnaire", "ensemble", "tuple", "enumerer", "toutes", "n'importe lequel", "plage", "type"
+        ]
 
         for keyword in keywords:
             pattern = QRegularExpression(f"\\b{keyword}\\b")
@@ -250,6 +250,11 @@ class FrenpyIDE(QMainWindow):
         stop_button.clicked.connect(self.stop_script)
         button_layout.addWidget(stop_button)
 
+        # Add a new button to retrieve and display words
+        words_button = QPushButton("Get Words", self)
+        words_button.clicked.connect(self.display_words)
+        button_layout.addWidget(words_button)
+
         main_layout.addLayout(button_layout)
 
         self.console_output.appendPlainText("Aucun espace de travail sélectionné.")
@@ -437,7 +442,6 @@ class FrenpyIDE(QMainWindow):
             if word:
                 self.completer.setCompletionPrefix(word)
                 self.completer.complete()
-
     def insert_completion(self, completion):
         current_editor = self.tab_widget.currentWidget()
         if current_editor:
