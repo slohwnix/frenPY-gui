@@ -137,7 +137,8 @@ class CodeEditor(QPlainTextEdit):
             line_text = cursor.selectedText()
             super().keyPressEvent(event)
             if line_text.strip().endswith(":"):
-                cursor.insertText("\n" + " " * 4)
+                cursor = self.textCursor()
+                cursor.insertText(" " * 4)
                 self.setTextCursor(cursor)
         elif event.key() in (Qt.Key.Key_ParenLeft, Qt.Key.Key_BraceLeft, Qt.Key.Key_BracketLeft, Qt.Key.Key_QuoteDbl, Qt.Key.Key_Apostrophe):
             char_map = {
