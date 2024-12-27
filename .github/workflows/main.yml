@@ -42,7 +42,7 @@ jobs:
     - name: Build with PyInstaller
       run: |
         .\env\Scripts\activate.bat
-        pyinstaller main.py --noconfirm --hide-console
+        pyinstaller main.py --noconfirm --hide-console hide-early
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
