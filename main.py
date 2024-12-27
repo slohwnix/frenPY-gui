@@ -21,7 +21,14 @@ class PythonHighlighter(QSyntaxHighlighter):
         keyword_format = QTextCharFormat()
         keyword_format.setForeground(QColor("white"))
         keyword_format.setFontWeight(QFont.Weight.Bold)
-        keywords = get_words_frenpy()
+        keywords = [
+    "importer", "afficher", "si", "sinon", "répéter à l'infini", "arrondir", "nouvelle_écran", "stopper", "attendre", 
+    "saisir", "dans la", "frpy_scc=True", "frpy_debug=True", "frpy_debug=False", "retourner", "et", "ou", "non", 
+    "vrai", "faux", "pour", "tant que", "essayer", "except", "avec", "classe", "importer comme", "depuis", "lever", 
+    "continuer", "passer", "supprimer", "global", "lambda", "assurer", "ranger", "longueur", "ouvrir", "liste", 
+    "dictionnaire", "ensemble", "tuple", "enumerer", "toutes", "n'importe lequel", "plage", "type"
+]
+
         for keyword in keywords:
             pattern = QRegularExpression(f"\\b{keyword}\\b")
             self.highlighting_rules.append((pattern, keyword_format))
