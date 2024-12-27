@@ -23,7 +23,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         keyword_format.setFontWeight(QFont.Weight.Bold)
         keywords = [
             "importer", "afficher", "si", "sinon", "répéter à l'infini", "arrondir", "nouvelle_écran", "frpy_info", "stopper", "attendre", "saisir",
-            "dans la", "frpy_scc=", "True", "False", "frpy_debug="
+            "dans la", "frpy_scc=", "True", "False", "frpy_debug=", "définir", "pour"
         ]
         for keyword in keywords:
             pattern = QRegularExpression(f"\\b{keyword}\\b")
@@ -454,9 +454,21 @@ class FrenpyIDE(QMainWindow):
                 return True
         return super().eventFilter(obj, event)
 
+    def closeEvent(self, event):
+        try:
+            if self.script_running and self.script_runner:
+                self.script_runner.stop()
+            event.accept()
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur", f"Erreur lors de la fermeture: {str(e)}")
+            event.ignore()
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     ide = FrenpyIDE()
     ide.show()
-    sys.exit(app.exec())
+    try:
+        sys.exit(app.exec())
+    except Exception as e:
+        print(f"Erreur lors de l'exécution de l'application: {str(e)}")
 
