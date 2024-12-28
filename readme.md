@@ -35,5 +35,6 @@ Si le fichier main.exe n'est pas dans le fichier zip, le fichier a surrement ét
   ```
 ## crédits :
    Pyqt6 -> QT group
+   
    Python-> Python Software Foundation
 
