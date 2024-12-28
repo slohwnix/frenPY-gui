@@ -34,7 +34,7 @@ class PythonHighlighter(QSyntaxHighlighter):
             self.highlighting_rules.append((pattern, keyword_format))
 
         string_format = QTextCharFormat()
-        string_format.setForeground(QColor("magenta"))
+        string_format.setForeground(QColor("lightblue"))
         self.highlighting_rules.append((QRegularExpression(r'"[^"\\]*(\\.[^"\\]*)*"'), string_format))
         self.highlighting_rules.append((QRegularExpression(r"'[^'\\]*(\\.[^'\\]*)*'"), string_format))
 
@@ -75,8 +75,10 @@ class CodeEditor(QPlainTextEdit):
         self.blockCountChanged.connect(self.update_line_number_area_width)
         self.updateRequest.connect(self.update_line_number_area)
         self.cursorPositionChanged.connect(self.highlight_current_line)
+        self.textChanged.connect(self.mark_modified)
         self.update_line_number_area_width(0)
         self.highlight_current_line()
+        self.file_path = None
 
     def line_number_area_width(self):
         digits = 1
@@ -159,6 +161,17 @@ class CodeEditor(QPlainTextEdit):
         else:
             super().keyPressEvent(event)
 
+    def mark_modified(self):
+        parent_widget = self.parentWidget()
+        if parent_widget:
+            main_window = parent_widget.parentWidget()
+            if main_window and hasattr(main_window, 'tab_widget'):
+                current_index = main_window.tab_widget.indexOf(self)
+                if current_index != -1:
+                    tab_text = main_window.tab_widget.tabText(current_index)
+                    if not tab_text.endswith('*'):
+                        main_window.tab_widget.setTabText(current_index, tab_text + '*')
+
 class ScriptRunner(QThread):
     output_signal = pyqtSignal(str)
     input_signal = pyqtSignal(str)
@@ -173,11 +186,13 @@ class ScriptRunner(QThread):
     def run(self):
         self.started_signal.emit()
         self.process = QProcess()
-        self.process.setProgram("python")
+        self.process.setProgram(os.path.join("..", "python", "python.exe"))
         self.process.setArguments([self.script_path])
         self.process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
         self.process.readyReadStandardOutput.connect(lambda: self.output_signal.emit(self.process.readAllStandardOutput().data().decode()))
         self.process.readyReadStandardError.connect(lambda: self.output_signal.emit(self.process.readAllStandardError().data().decode()))
+        self.process.started.connect(lambda: self.output_signal.emit("Process started"))
+        self.process.finished.connect(lambda code, status: self.output_signal.emit(f"Process finished with code {code}, status {status}"))
         self.process.start()
         self.process.waitForFinished()
         self.finished_signal.emit()
@@ -280,6 +295,11 @@ class FrenpyIDE(QMainWindow):
         save_action.triggered.connect(self.save_file)
         file_menu.addAction(save_action)
 
+        save_as_action = QAction("Save &As", self)
+        save_as_action.setShortcut("Ctrl+Shift+S")
+        save_as_action.triggered.connect(self.save_file_as)
+        file_menu.addAction(save_as_action)
+
         save_all_action = QAction("&Save All", self)
         save_all_action.triggered.connect(self.save_all_files)
         file_menu.addAction(save_all_action)
@@ -325,9 +345,22 @@ class FrenpyIDE(QMainWindow):
     def save_file(self):
         current_editor = self.tab_widget.currentWidget()
         if current_editor:
-            file_path, _ = QFileDialog.getSaveFileName(self, "Save File", "", "Frenpy files (*.frenpy);;All Files (*)")
+            if current_editor.file_path:
+                with open(current_editor.file_path, "w", encoding="utf-8") as file:
+                    content = current_editor.toPlainText()
+                    file.write(content)
+                self.tab_widget.setTabText(self.tab_widget.currentIndex(), os.path.basename(current_editor.file_path))
+                self.current_file_label.setText(current_editor.file_path)
+            else:
+                self.save_file_as()
+
+    def save_file_as(self):
+        current_editor = self.tab_widget.currentWidget()
+        if current_editor:
+            file_path, _ = QFileDialog.getSaveFileName(self, "Save File As", "", "Frenpy files (*.frenpy);;All Files (*)")
             if file_path:
-                with open(file_path, "w") as file:
+                current_editor.file_path = file_path
+                with open(file_path, "w", encoding="utf-8") as file:
                     content = current_editor.toPlainText()
                     file.write(content)
                 self.tab_widget.setTabText(self.tab_widget.currentIndex(), os.path.basename(file_path))
@@ -368,6 +401,11 @@ class FrenpyIDE(QMainWindow):
                     temp_file_path = temp_file.name
                 compiled_code = compile_frenpy(temp_file_path)
                 if compiled_code:
+                    if "frpy_debug=True" in compiled_code:
+                        self.console_output.appendPlainText(f"Code compilé :\n{compiled_code}")
+                        self.console_output.appendPlainText(f"Code source :\n{script_content}")
+                    if "frpy_scc=True" in script_content:
+                        self.save_actual_file("compiled.py", compiled_code)
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".py", mode='w', encoding='utf-8') as compiled_file:
                         compiled_file.write(compiled_code)
                         compiled_file_path = compiled_file.name
@@ -375,8 +413,17 @@ class FrenpyIDE(QMainWindow):
                     self.script_runner.output_signal.connect(self.console_output.appendPlainText)
                     self.script_runner.started_signal.connect(self.on_script_started)
                     self.script_runner.finished_signal.connect(self.on_script_finished)
+                    self.script_runner.input_signal.connect(self.script_runner.write_input)
                     self.script_runner.start()
                     os.remove(temp_file_path)
+
+    def save_actual_file(self, fichier_name, content):
+        try:
+            with open(fichier_name, 'w', encoding='utf-8') as file:
+                file.write(content)
+            self.console_output.appendPlainText(f"Le fichier {fichier_name} a été sauvegardé !")
+        except Exception as errors:
+            self.console_output.appendPlainText(f"Erreur lors de l'enregistrement : {str(errors)}")
 
     def stop_script(self):
         if self.script_running:
