@@ -1,6 +1,0 @@
-afficher('salut')
-test = saisir("quelle heure est-il ")
-si test == str("10h00"):
-    afficher('il est 10h')
-sinon :
-    afficher("il est pas 10h")
