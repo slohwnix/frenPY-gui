@@ -33,5 +33,7 @@ Si le fichier main.exe n'est pas dans le fichier zip, le fichier a surrement ét
   .\update.bat
   .\python\python.exe .\scripts\frenpy_ide.py
   ```
-  
+## crédits :
+   Pyqt6 -> QT group
+   Python-> Python Software Foundation
 
