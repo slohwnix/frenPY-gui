@@ -9,7 +9,6 @@ frenPY ide est une application qui permet de compiler, de coder et d'éxécuter 
 Pour installer frenpy IDE, vous devez :
 - Télécharger la dernière version à cette adresse : [ICI](https://github.com/slohwnix/frenPY-ide/releases/download/release1.8/frenPY-ide-win1.8.zip)
 - Extrayer le .zip téléchargé précédemment
-- Exécuter le **update.bat** et, après son exécution, appuyez sur Entrée
 - Lancer le main.exe
 
  # Dépannages :
@@ -30,7 +29,7 @@ Si le fichier main.exe n'est pas dans le fichier zip, le fichier a surrement ét
   ```
 - Une fois l'environnement configuré éxécuter :
   ```batch
-  .\update.bat
+  .\python\python.exe .\scripts\update.py
   .\python\python.exe .\scripts\frenpy_ide.py
   ```
 ## crédits :
