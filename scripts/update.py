@@ -18,12 +18,24 @@ def read_json_file(filepath):
         print(f"Erreur lors de la lecture du fichier JSON {filepath} : {e}")
         exit(1)
 
-def update_if_needed(local_version, remote_version, update_script):
+def update_if_needed(local_version, remote_version, local_file_path, json_remote, remote_file_path):
     if local_version < remote_version:
         print("Une mise à jour est nécessaire. Exécution du script de mise à jour...")
-        subprocess.run(update_script, shell=True)
+        try:
+            subprocess.run(["curl", "--ssl-no-revoke", "https://raw.githubusercontent.com/slohwnix/frenPY-ide/refs/heads/main/scripts/frenpy_ide.py", "-o", "scripts/frenpy_ide.py"], check=True)
+            print("Script mis à jour avec succès.")
+            # Mettre à jour la version dans le fichier local
+            with open(local_file_path, 'w') as file:
+                json.dump(json_remote, file, indent=4)
+            print(f"Version mise à jour dans {local_file_path}")
+        except subprocess.SubprocessError as e:
+            print(f"Erreur lors de la mise à jour du script : {e}")
+            exit(1)
     else:
         print("Aucune mise à jour nécessaire.")
+    # Supprimer le fichier distant après la mise à jour
+    os.remove(remote_file_path)
+    print(f"Fichier supprimé : {remote_file_path}")
 
 def install_dependencies():
     try:
@@ -60,8 +72,7 @@ def main():
     # Comparer les versions et effectuer les mises à jour si nécessaire
     local_version = json_local.get("version", "0.0.0")
     remote_version = json_remote.get("version", "0.0.0")
-    update_script = "./update.bat"
-    update_if_needed(local_version, remote_version, update_script)
+    update_if_needed(local_version, remote_version, local_file_path, json_remote, remote_file_path)
 
     # Installer les dépendances et exécuter le script Python
     install_dependencies()
