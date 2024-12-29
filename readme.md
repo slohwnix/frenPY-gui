@@ -32,8 +32,16 @@ Si le fichier main.exe n'est pas dans le fichier zip, le fichier a surrement ét
   .\python\python.exe .\scripts\update.py
   .\python\python.exe .\scripts\frenpy_ide.py
   ```
+## Sécurité :
+Frpy-ide ne possède pas de virus, pour vous le prouvez, nous avons fait un test sur virustotal :
+
+![screenshot](docs/virus_total.png)
+https://www.virustotal.com/gui/file/7392bea4f6e6c5d451d6afb5fac85499817718bed4c2692819948600b1a0d86e
+
+
 ## crédits :
    Pyqt6 -> QT group
    
    Python-> Python Software Foundation
+
 
